@@ -1,0 +1,18 @@
+# Terraform local state and caches
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Plans and temp files
+*.tfplan
+tfplan
+*.backup
+
+# Secrets and local overrides
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# macOS
+.DS_Store

@@ -1,0 +1,70 @@
+region   = "br-sao"
+zone     = "br-sao-1"
+basename = "funpresp-sei-prd"
+vpc_cidr = "10.60.0.0/16"
+
+# Gere uma chave local e informe o caminho do arquivo .pub.
+ssh_public_key_path = "/path/to/your/.ssh/id_ed25519.pub"
+
+# Obrigatorio: informe image IDs validos da regiao br-sao.
+# AWS referencia:
+# - SEI: Ubuntu 24.04 (Noble)
+# - SOLR: Ubuntu 24.04 (Noble)
+# - MariaDB: Ubuntu 20.04 (Focal)
+image_id_app  = "r006-CHANGE_ME_IMAGE_ID_APP_24_04"
+image_id_solr = "r006-CHANGE_ME_IMAGE_ID_SOLR_24_04"
+image_id_db   = "r006-CHANGE_ME_IMAGE_ID_DB_20_04"
+
+admin_cidr               = "10.1.0.0/16"
+admin_rdp_cidrs          = ["10.1.22.0/24", "10.1.4.14/32", "10.1.5.12/32", "10.1.4.173/32"]
+admin_all_protocol_cidrs = ["10.1.4.60/32", "10.1.4.47/32", "10.50.3.11/32", "10.1.4.118/32", "10.1.1.0/24"]
+admin_tcp_full_cidrs     = ["10.1.5.15/32"]
+admin_wsus_cidr          = "10.1.1.16/32"
+admin_sql_1433_cidrs     = ["10.1.4.16/32", "10.1.4.196/32"]
+subnet_app_cidr          = "10.60.4.0/24"
+subnet_db_cidr           = "10.60.3.0/24"
+subnet_public_cidr       = "10.60.16.0/24"
+
+app_profile = "bx2-2x8"
+db_profile  = "bx2-2x16"
+
+app_port  = 443
+solr_port = 8983
+db_port   = 3306
+
+db_data_volume_size_gb = 500
+
+lb_enabled             = true
+lb_name                = "alb-sei-prd"
+lb_type                = "public"
+lb_listener_http_port  = 80
+lb_listener_https_port = 443
+# O ARN do ACM da AWS NAO funciona na IBM. Aqui precisa do CRN de certificado IBM.
+lb_certificate_crn = "crn:v1:bluemix:public:secrets-manager:br-sao:a/CHANGE_ME:CHANGE_ME:secret:CHANGE_ME"
+
+create_public_gateway               = true
+attach_public_gateway_to_app_subnet = true
+attach_public_gateway_to_db_subnet  = false
+
+vpn_enabled     = true
+vpn_name        = "vpn-funpresp-ibm"
+vpn_mode        = "policy"
+vpn_local_cidr  = "10.60.0.0/16"
+vpn_remote_cidr = "10.1.0.0/16"
+vpn_peer_gateways = {
+  CLICKNET = "190.103.170.82"
+  ALLREDE  = "131.100.149.18"
+  NWI      = "189.85.93.174"
+}
+# PSKs novas para cada peer (obrigatorio trocar antes do apply de producao).
+vpn_preshared_keys = {
+  CLICKNET = "CHANGE_ME_PSK_CLICKNET"
+  ALLREDE  = "CHANGE_ME_PSK_ALLREDE"
+  NWI      = "CHANGE_ME_PSK_NWI"
+}
+
+resource_tags = [
+  "env:prod",
+  "projeto:sei",
+  "owner:coinf"
+]
