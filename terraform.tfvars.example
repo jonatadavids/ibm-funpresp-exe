@@ -44,7 +44,7 @@ lb_certificate_crn = "crn:v1:bluemix:public:secrets-manager:br-sao:a/CHANGE_ME:C
 
 create_public_gateway               = true
 attach_public_gateway_to_app_subnet = true
-attach_public_gateway_to_db_subnet  = false
+attach_public_gateway_to_db_subnet  = true
 
 vpn_enabled     = true
 vpn_name        = "vpn-funpresp-ibm"
