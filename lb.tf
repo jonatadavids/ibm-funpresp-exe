@@ -1,4 +1,4 @@
-# Load Balancer publico para terminação TLS e encaminhamento ao SEI.
+# Load Balancer publico em HTTP para encaminhamento ao SEI.
 resource "ibm_is_lb" "sei" {
   count           = var.lb_enabled ? 1 : 0
   name            = "${local.basename}-${var.lb_name}"
@@ -30,26 +30,10 @@ resource "ibm_is_lb_pool_member" "sei" {
   target_address = ibm_is_instance.sei.primary_network_interface[0].primary_ip[0].address
 }
 
-resource "ibm_is_lb_listener" "https" {
-  count                = var.lb_enabled ? 1 : 0
-  lb                   = ibm_is_lb.sei[0].id
-  protocol             = "https"
-  port                 = var.lb_listener_https_port
-  default_pool         = ibm_is_lb_pool.sei_https[0].id
-  certificate_instance = var.lb_certificate_crn
-}
-
 resource "ibm_is_lb_listener" "http" {
-  count    = var.lb_enabled ? 1 : 0
-  lb       = ibm_is_lb.sei[0].id
-  protocol = "http"
-  port     = var.lb_listener_http_port
-
-  https_redirect {
-    http_status_code = 301
-
-    listener {
-      id = ibm_is_lb_listener.https[0].listener_id
-    }
-  }
+  count        = var.lb_enabled ? 1 : 0
+  lb           = ibm_is_lb.sei[0].id
+  protocol     = "http"
+  port         = var.lb_listener_http_port
+  default_pool = ibm_is_lb_pool.sei_https[0].id
 }

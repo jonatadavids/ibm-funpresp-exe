@@ -3,8 +3,8 @@ zone     = "br-sao-1"
 basename = "funpresp-sei-prd"
 vpc_cidr = "10.60.0.0/16"
 
-# Gere uma chave local e informe o caminho do arquivo .pub.
-ssh_public_key_path = "/path/to/your/.ssh/id_ed25519.pub"
+# IBM Cloud VPC SSH key exige RSA no formato OpenSSH.
+ssh_public_key_path = "/path/to/your/.ssh/id_rsa.pub"
 
 # Obrigatorio: informe image IDs validos da regiao br-sao.
 # AWS referencia:
