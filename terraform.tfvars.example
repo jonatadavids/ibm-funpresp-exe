@@ -25,8 +25,10 @@ subnet_app_cidr          = "10.60.4.0/24"
 subnet_db_cidr           = "10.60.3.0/24"
 subnet_public_cidr       = "10.60.16.0/24"
 
-app_profile = "bx2-2x8"
-db_profile  = "bx2-2x16"
+app_profile     = "bx2-2x8"
+db_profile      = "mx2-2x16"
+bastion_enabled = true
+bastion_profile = "bx2-2x4"
 
 app_port  = 443
 solr_port = 8983

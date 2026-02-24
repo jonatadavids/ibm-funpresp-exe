@@ -31,6 +31,14 @@ resource "ibm_is_security_group" "sg_db" {
   tags = local.common_tags
 }
 
+# SG do bastion para acesso administrativo.
+resource "ibm_is_security_group" "sg_bastion" {
+  count = var.bastion_enabled ? 1 : 0
+  name  = "${local.basename}-sg-bastion"
+  vpc   = ibm_is_vpc.vpc.id
+  tags  = local.common_tags
+}
+
 # SG dedicado do Load Balancer (equivalente ao sg_internet).
 resource "ibm_is_security_group" "sg_lb" {
   count = var.lb_enabled ? 1 : 0
@@ -187,6 +195,40 @@ resource "ibm_is_security_group_rule" "db_in_from_app" {
   port_max = var.db_port
 }
 
+# Bastion pode acessar SSH das instancias privadas.
+resource "ibm_is_security_group_rule" "app_in_ssh_bastion" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_app.id
+  direction = "inbound"
+  remote    = ibm_is_security_group.sg_bastion[0].id
+
+  protocol = "tcp"
+  port_min = 22
+  port_max = 22
+}
+
+resource "ibm_is_security_group_rule" "solr_in_ssh_bastion" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_solr.id
+  direction = "inbound"
+  remote    = ibm_is_security_group.sg_bastion[0].id
+
+  protocol = "tcp"
+  port_min = 22
+  port_max = 22
+}
+
+resource "ibm_is_security_group_rule" "db_in_ssh_bastion" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_db.id
+  direction = "inbound"
+  remote    = ibm_is_security_group.sg_bastion[0].id
+
+  protocol = "tcp"
+  port_min = 22
+  port_max = 22
+}
+
 # -----------------------
 # OUTBOUND rules
 # -----------------------
@@ -262,6 +304,54 @@ resource "ibm_is_security_group_rule" "db_out_admin_tcp" {
   protocol = "tcp"
   port_min = 1
   port_max = 65535
+}
+
+# Bastion: entrada SSH de rede administrativa.
+resource "ibm_is_security_group_rule" "bastion_in_ssh_admin" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_bastion[0].id
+  direction = "inbound"
+  remote    = var.admin_cidr
+
+  protocol = "tcp"
+  port_min = 22
+  port_max = 22
+}
+
+# Bastion: saida SSH para subnets privadas.
+resource "ibm_is_security_group_rule" "bastion_out_ssh_vpc" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_bastion[0].id
+  direction = "outbound"
+  remote    = var.vpc_cidr
+
+  protocol = "tcp"
+  port_min = 22
+  port_max = 22
+}
+
+# Bastion: saida HTTPS para updates do sistema.
+resource "ibm_is_security_group_rule" "bastion_out_https" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_bastion[0].id
+  direction = "outbound"
+  remote    = "0.0.0.0/0"
+
+  protocol = "tcp"
+  port_min = 443
+  port_max = 443
+}
+
+# Bastion: DNS para resolucao de nomes.
+resource "ibm_is_security_group_rule" "bastion_out_dns_udp" {
+  count     = var.bastion_enabled ? 1 : 0
+  group     = ibm_is_security_group.sg_bastion[0].id
+  direction = "outbound"
+  remote    = "0.0.0.0/0"
+
+  protocol = "udp"
+  port_min = 53
+  port_max = 53
 }
 
 # -----------------------

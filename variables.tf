@@ -84,6 +84,18 @@ variable "db_profile" {
   description = "Profile IBM Cloud para servidor de banco"
 }
 
+variable "bastion_enabled" {
+  type        = bool
+  description = "Se deve criar servidor bastion para acesso administrativo"
+  default     = false
+}
+
+variable "bastion_profile" {
+  type        = string
+  description = "Profile IBM Cloud para servidor bastion"
+  default     = "bx2-2x4"
+}
+
 variable "image_id_app" {
   type        = string
   description = "ID da imagem IBM Cloud para o servidor SEI (app)"

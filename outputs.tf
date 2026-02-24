@@ -27,6 +27,14 @@ output "mariadb_private_ip" {
   value = ibm_is_instance.mariadb.primary_network_interface[0].primary_ip[0].address
 }
 
+output "bastion_private_ip" {
+  value = var.bastion_enabled ? ibm_is_instance.bastion[0].primary_network_interface[0].primary_ip[0].address : null
+}
+
+output "bastion_public_ip" {
+  value = var.bastion_enabled ? ibm_is_floating_ip.bastion[0].address : null
+}
+
 output "lb_hostname" {
   value = var.lb_enabled ? ibm_is_lb.sei[0].hostname : null
 }

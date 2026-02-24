@@ -77,3 +77,27 @@ resource "ibm_is_instance_volume_attachment" "mariadb_data" {
   name                             = "${local.basename}-mariadb-data-att"
   delete_volume_on_instance_delete = false
 }
+
+# VSI Bastion em subnet publica para acesso administrativo SSH.
+resource "ibm_is_instance" "bastion" {
+  count   = var.bastion_enabled ? 1 : 0
+  name    = "${local.basename}-bastion"
+  vpc     = ibm_is_vpc.vpc.id
+  zone    = local.zone
+  keys    = [ibm_is_ssh_key.workload_key.id]
+  image   = var.image_id_app
+  profile = var.bastion_profile
+  tags    = local.common_tags
+
+  primary_network_interface {
+    subnet          = ibm_is_subnet.subnet_public.id
+    security_groups = [ibm_is_security_group.sg_bastion[0].id]
+  }
+}
+
+resource "ibm_is_floating_ip" "bastion" {
+  count  = var.bastion_enabled ? 1 : 0
+  name   = "${local.basename}-bastion-fip"
+  target = ibm_is_instance.bastion[0].primary_network_interface[0].id
+  tags   = local.common_tags
+}
