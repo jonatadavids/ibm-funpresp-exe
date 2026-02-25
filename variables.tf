@@ -93,7 +93,7 @@ variable "bastion_enabled" {
 variable "bastion_profile" {
   type        = string
   description = "Profile IBM Cloud para servidor bastion"
-  default     = "bx2-2x4"
+  default     = "bx2-2x8"
 }
 
 variable "image_id_app" {
